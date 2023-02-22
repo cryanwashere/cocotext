@@ -35,8 +35,15 @@ def optimize(image, mask):
         #print("found kernel gradients, shape: {}".format(k_grad.shape))
         model.kernels[i] -= 0.01 * k_grad
 def optimize2(image, mask):
-    k_grad_fn = jax.grad(graph_fn, argnums=[1,2,3,4,5,6,7,8])
+    
+    autodif_start = time.time()
+    k_grad_fn = jax.grad(graph_fn, argnums=[2,3,4,5,6,7,8,9])
+    print("autodif complete after: {}".format(time.time()-autodif_start))
+
+    grad_start = time.time()
     k_grads = k_grad_fn(image, mask, *model.kernels)
+    print("grad complete after: {}".format(time.time()-grad_start))
+
     for i in range(len(model.kernels)):
         model.kernels[i] -= 0.1 * k_grads[i]
 
@@ -48,18 +55,16 @@ train_steps = 1 if sys.argv[3] == '' else int(sys.argv[3])
 print("training for {} steps".format(train_steps))
 
 for i in range(1, train_steps+1):
-    try:
-        image, mask = data.load_random_image_chunk('sample_image_set', 8, data.cocotext)
-        mask = np.expand_dims(mask, axis=-1)
-        #print(mask.shape)
-        print("step: {}".format(i))
-        print(graph_fn(image, mask, *model.kernels))
-        step_start = time.time()
-        optimize2(image, mask)
-        print("step finished after {}".format(time.time() - step_start))
-        print(graph_fn(image, mask, *model.kernels))
-    except:
-        print("training step failed")
+    
+    image, mask = data.load_random_image_chunk('sample_image_set', 8, data.cocotext)
+    mask = np.expand_dims(mask, axis=-1)
+    #print(mask.shape)
+    print("step: {}".format(i))
+    print(graph_fn(image, mask, *model.kernels))
+    step_start = time.time()
+    optimize2(image, mask)
+    print("step finished after {}".format(time.time() - step_start))
+    print(graph_fn(image, mask, *model.kernels))
 
 model.save_kernels(to_path)
 print("saved model weights")
