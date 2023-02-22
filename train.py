@@ -47,6 +47,7 @@ def optimize2(image, mask):
     for i in range(len(model.kernels)):
         model.kernels[i] -= 0.1 * k_grads[i]
 
+'''
 from_path = sys.argv[1]
 to_path = sys.argv[2]
 model.load_kernels(from_path)
@@ -68,3 +69,4 @@ for i in range(1, train_steps+1):
 
 model.save_kernels(to_path)
 print("saved model weights")
+'''
