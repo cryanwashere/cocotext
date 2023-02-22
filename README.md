@@ -1,0 +1,1 @@
+this is a Jax based program for text detection, created using the coco text dataset. 
