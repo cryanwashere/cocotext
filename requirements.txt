@@ -2,3 +2,4 @@ jax
 jaxlib
 Pillow
 scikit-image
+pycocotools
